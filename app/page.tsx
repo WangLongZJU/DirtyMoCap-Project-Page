@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 const clamp = (value: number, min: number, max: number) =>
   Math.min(Math.max(value, min), max);
@@ -99,12 +99,95 @@ export default function Home() {
   const titleRef = useRef<HTMLElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const creditsRef = useRef<HTMLElement>(null);
+  const cmuResultsRef = useRef<HTMLElement>(null);
+  const hkmalaResultsRef = useRef<HTMLElement>(null);
   const videoRatioRef = useRef(16 / 9);
+  const [heroLoadProgress, setHeroLoadProgress] = useState(0);
+  const [isHeroVideoFullyBuffered, setIsHeroVideoFullyBuffered] = useState(false);
+  const [shouldLoadCmuResults, setShouldLoadCmuResults] = useState(false);
+  const [shouldLoadHkmalaResults, setShouldLoadHkmalaResults] = useState(false);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const updateHeroLoadProgress = () => {
+      const duration = video.duration;
+      if (!Number.isFinite(duration) || duration <= 0) return;
+
+      let bufferedEnd = 0;
+      for (let index = 0; index < video.buffered.length; index += 1) {
+        bufferedEnd = Math.max(bufferedEnd, video.buffered.end(index));
+      }
+
+      const progress = clamp((bufferedEnd / duration) * 100, 0, 100);
+      setHeroLoadProgress(progress);
+
+      if (progress >= 99.5) {
+        setHeroLoadProgress(100);
+        setIsHeroVideoFullyBuffered(true);
+      }
+    };
+
+    const events = ['loadedmetadata', 'loadeddata', 'progress', 'suspend'];
+    events.forEach((eventName) =>
+      video.addEventListener(eventName, updateHeroLoadProgress),
+    );
+    updateHeroLoadProgress();
+
+    return () => {
+      events.forEach((eventName) =>
+        video.removeEventListener(eventName, updateHeroLoadProgress),
+      );
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!isHeroVideoFullyBuffered) return;
+
+    const observedSections = [
+      {
+        element: cmuResultsRef.current,
+        load: () => setShouldLoadCmuResults(true),
+      },
+      {
+        element: hkmalaResultsRef.current,
+        load: () => setShouldLoadHkmalaResults(true),
+      },
+    ].filter(
+      (
+        section,
+      ): section is { element: HTMLElement; load: () => void } =>
+        section.element !== null,
+    );
+
+    if (!('IntersectionObserver' in window)) {
+      observedSections.forEach(({ load }) => load());
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+
+          observedSections
+            .find(({ element }) => element === entry.target)
+            ?.load();
+          observer.unobserve(entry.target);
+        });
+      },
+      { threshold: 0.1 },
+    );
+
+    observedSections.forEach(({ element }) => observer.observe(element));
+    return () => observer.disconnect();
+  }, [isHeroVideoFullyBuffered]);
 
   useEffect(() => {
     const resultVideos = Array.from(
       document.querySelectorAll<HTMLVideoElement>('.result-video'),
-    );
+    ).filter((video) => video.dataset.mediaLoaded === 'true');
 
     const keepConfiguredSpeed = (event: Event) => {
       setConfiguredPlaybackRate(event.currentTarget as HTMLVideoElement);
@@ -130,7 +213,7 @@ export default function Home() {
         video.removeEventListener('ratechange', keepConfiguredSpeed);
       });
     };
-  }, []);
+  }, [shouldLoadCmuResults, shouldLoadHkmalaResults]);
 
   useEffect(() => {
     const hero = heroRef.current;
@@ -252,6 +335,20 @@ export default function Home() {
             >
               <source src="dataset.mp4" type="video/mp4" />
             </video>
+            <div
+              className={`teaser-load-indicator${isHeroVideoFullyBuffered ? ' is-complete' : ''}`}
+              role="status"
+              aria-live="polite"
+              aria-label={`Loading hero video: ${Math.round(heroLoadProgress)} percent`}
+            >
+              <span>Loading video · {Math.round(heroLoadProgress)}%</span>
+              <span className="teaser-load-track" aria-hidden="true">
+                <span
+                  className="teaser-load-value"
+                  style={{ width: `${heroLoadProgress}%` }}
+                />
+              </span>
+            </div>
           </div>
 
           <div className="scroll-cue" aria-hidden="true">
@@ -275,7 +372,7 @@ export default function Home() {
           <a className="author-block author-link" href="https://nudt-sawlab.github.io/" target="_blank" rel="noreferrer">Shen Yan<sup>4</sup>,</a>
           <a className="author-block author-link" href="https://ysysimon.com/" target="_blank" rel="noreferrer">Siyuan Yu<sup>2</sup>,</a>
           <a className="author-block author-link" href="https://xiaobenli00.github.io/" target="_blank" rel="noreferrer">Xiaoben Li<sup>1,2</sup>,</a>
-          <a className="author-block author-link" href="https://zcai0612.github.io/" target="_blank" rel="noreferrer">Zeyu Cai<sup>5</sup>,</a>
+          <a className="author-block author-link" href="https://zcai0612.github.io/" target="_blank" rel="noreferrer">Zeyu Cai<sup>2,5</sup>,</a>
           <a className="author-block author-link" href="https://yumenghou.com/" target="_blank" rel="noreferrer">Yumeng Hou<sup>6</sup>,</a>
           <a className="author-block author-link" href="https://xiuyuliang.cn/" target="_blank" rel="noreferrer">Yuliang Xiu<sup>2</sup></a>
         </div>
@@ -305,7 +402,7 @@ export default function Home() {
             <span className="resource-label">Code</span>
             <span className="resource-status">GitHub</span>
           </a>
-          {['arXiv', 'Data', 'License'].map((label) => (
+          {['arXiv', 'Data'].map((label) => (
             <button
               key={label}
               className="resource-button"
@@ -367,12 +464,14 @@ export default function Home() {
                 loop
                 controls
                 playsInline
-                preload="metadata"
+                preload={isHeroVideoFullyBuffered ? 'metadata' : 'none'}
+                src={
+                  isHeroVideoFullyBuffered
+                    ? 'dirtymocap-abstract.mp4'
+                    : undefined
+                }
                 aria-label="DirtyMoCap overview video"
-              >
-                <source src="dirtymocap-abstract.mp4" type="video/mp4" />
-                Your browser does not support the video tag.
-              </video>
+              />
             </div>
 
             <p className="abstract-tldr">
@@ -424,6 +523,7 @@ export default function Home() {
       </section>
 
       <section
+        ref={cmuResultsRef}
         id="cmu-grab-results"
         className="results-section"
         aria-labelledby="cmu-grab-results-title"
@@ -454,16 +554,16 @@ export default function Home() {
                           loop
                           controls
                           playsInline
-                          preload="auto"
+                          preload={shouldLoadCmuResults ? 'auto' : 'none'}
+                          src={
+                            shouldLoadCmuResults
+                              ? `results/syn-results-${sequence}.mp4`
+                              : undefined
+                          }
+                          data-media-loaded={shouldLoadCmuResults ? 'true' : undefined}
                           data-playback-rate="2"
                           aria-label={`CMU and GRAB result sequence ${sequence}`}
-                        >
-                          <source
-                            src={`results/syn-results-${sequence}.mp4`}
-                            type="video/mp4"
-                          />
-                          Your browser does not support the video tag.
-                        </video>
+                        />
                       </figure>
                     ))}
                   </div>
@@ -475,6 +575,7 @@ export default function Home() {
       </section>
 
       <section
+        ref={hkmalaResultsRef}
         id="hkmala-results"
         className="results-section hkmala-results-section"
         aria-labelledby="hkmala-results-title"
@@ -518,16 +619,16 @@ export default function Home() {
                           loop
                           controls
                           playsInline
-                          preload="auto"
+                          preload={shouldLoadHkmalaResults ? 'auto' : 'none'}
+                          src={
+                            shouldLoadHkmalaResults
+                              ? `results/${videoResult.filename}`
+                              : undefined
+                          }
+                          data-media-loaded={shouldLoadHkmalaResults ? 'true' : undefined}
                           data-playback-rate="1"
                           aria-label={`HKMALA-Motion result ${videoResult.filename.replace('.mp4', '')}`}
-                        >
-                          <source
-                            src={`results/${videoResult.filename}`}
-                            type="video/mp4"
-                          />
-                          Your browser does not support the video tag.
-                        </video>
+                        />
                         <figcaption className="hkmala-video-caption">
                           <span className="hkmala-style-english">
                             {videoResult.kungfuStyleEnglish}
