@@ -296,7 +296,16 @@ export default function Home() {
         <p className="venue">SIGGRAPH Asia 2026</p>
 
         <div className="resource-links" role="group" aria-label="Project resources">
-          {['Code', 'arXiv', 'Data', 'License'].map((label) => (
+          <a
+            className="resource-button resource-button-available"
+            href="https://github.com/WangLongZJU/DirtyMoCap"
+            target="_blank"
+            rel="noreferrer"
+          >
+            <span className="resource-label">Code</span>
+            <span className="resource-status">GitHub</span>
+          </a>
+          {['arXiv', 'Data', 'License'].map((label) => (
             <button
               key={label}
               className="resource-button"

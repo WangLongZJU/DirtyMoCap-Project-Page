@@ -253,6 +253,26 @@ body {
   opacity: 1;
 }
 
+.resource-button-available {
+  border-color: #517c69;
+  background: #517c69;
+  color: #fff;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color 160ms ease, border-color 160ms ease,
+    transform 160ms ease;
+}
+
+.resource-button-available:hover {
+  border-color: #3d6252;
+  background: #3d6252;
+  transform: translateY(-1px);
+}
+
+.resource-button-available .resource-status {
+  color: rgba(255, 255, 255, 0.76);
+}
+
 .resource-label {
   font-size: 0.98rem;
   font-weight: 600;
