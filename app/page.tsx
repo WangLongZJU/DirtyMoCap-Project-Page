@@ -680,6 +680,25 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      <section
+        id="citation"
+        className="citation-section"
+        aria-labelledby="citation-title"
+      >
+        <div className="citation-inner">
+          <h2 id="citation-title" className="section-title">
+            BibTeX
+          </h2>
+          <p className="citation-intro">If you find our work useful, please cite:</p>
+          <pre className="citation-code"><code>{`@article{wang2026dirtymocap,
+  title={DirtyMoCap: Robust Motion Capture from Unconstrained Markers},
+  author={Wang, Long and Zhao, Shuting and Yan, Shen and Yu, Siyuan and Li, Xiaoben and Cai, Zeyu and Hou, Yumeng and Xiu, Yuliang},
+  journal={arXiv preprint arXiv:2609.19927},
+  year={2026}
+}`}</code></pre>
+        </div>
+      </section>
     </main>
   );
 }

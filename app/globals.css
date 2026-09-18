@@ -791,6 +791,42 @@ body {
   margin: 0;
 }
 
+.citation-section {
+  position: relative;
+  z-index: 3;
+  width: 100%;
+  padding: clamp(14px, 1.75vw, 22.5px) 16px clamp(42px, 6vw, 76px);
+  background: #fff;
+}
+
+.citation-inner {
+  width: min(100%, 1000px);
+  margin: 0 auto;
+}
+
+.citation-intro {
+  margin: 0 0 0.9rem;
+  color: #38433e;
+  font-size: clamp(0.98rem, 1.2vw, 1.08rem);
+  line-height: 1.5;
+}
+
+.citation-code {
+  margin: 0;
+  padding: clamp(14px, 2vw, 20px);
+  overflow-x: auto;
+  border: 1px solid #dce2df;
+  border-radius: 10px;
+  background: #f3f5f4;
+  color: #26312c;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: clamp(0.75rem, 1vw, 0.9rem);
+  line-height: 1.55;
+  text-align: left;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
 @media (max-width: 640px) {
   .publication-header {
     width: calc(100% - 24px);
@@ -908,6 +944,10 @@ body {
   }
 
   .acknowledgements-section {
+    padding: 11px 12px 42px;
+  }
+
+  .citation-section {
     padding: 11px 12px 42px;
   }
 
