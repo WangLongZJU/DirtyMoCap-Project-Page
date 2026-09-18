@@ -315,6 +315,16 @@ body {
   color: rgba(255, 255, 255, 0.76);
 }
 
+.resource-button-arxiv {
+  border-color: #a83232;
+  background: #a83232;
+}
+
+.resource-button-arxiv:hover {
+  border-color: #842626;
+  background: #842626;
+}
+
 .resource-label {
   font-size: 0.98rem;
   font-weight: 600;

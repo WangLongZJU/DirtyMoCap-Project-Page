@@ -402,7 +402,16 @@ export default function Home() {
             <span className="resource-label">Code</span>
             <span className="resource-status">GitHub</span>
           </a>
-          {['arXiv', 'Data'].map((label) => (
+          <a
+            className="resource-button resource-button-available resource-button-arxiv"
+            href="https://arxiv.org/abs/2609.19927"
+            target="_blank"
+            rel="noreferrer"
+          >
+            <span className="resource-label">arXiv</span>
+            <span className="resource-status">2609.19927</span>
+          </a>
+          {['Data'].map((label) => (
             <button
               key={label}
               className="resource-button"
