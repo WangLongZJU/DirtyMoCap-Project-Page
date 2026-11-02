@@ -411,18 +411,24 @@ export default function Home() {
             <span className="resource-label">arXiv</span>
             <span className="resource-status">2609.19927</span>
           </a>
-          {['Data'].map((label) => (
-            <button
-              key={label}
-              className="resource-button"
-              type="button"
-              disabled
-              title="Coming soon"
-            >
-              <span className="resource-label">{label}</span>
-              <span className="resource-status">Coming soon</span>
-            </button>
-          ))}
+          <a
+            className="resource-button resource-button-available"
+            href="https://github.com/WangLongZJU/DirtyMoCap/blob/main/Dataset.md"
+            target="_blank"
+            rel="noreferrer"
+          >
+            <span className="resource-label">Data</span>
+            <span className="resource-status">HKMALA-Motion</span>
+          </a>
+          <a
+            className="resource-button resource-button-available"
+            href="https://github.com/WangLongZJU/DirtyMoCap/blob/main/License.md"
+            target="_blank"
+            rel="noreferrer"
+          >
+            <span className="resource-label">License</span>
+            <span className="resource-status">Usage terms</span>
+          </a>
         </div>
       </section>
 
