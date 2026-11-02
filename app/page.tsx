@@ -412,7 +412,7 @@ export default function Home() {
             <span className="resource-status">2609.19927</span>
           </a>
           <a
-            className="resource-button resource-button-available"
+            className="resource-button resource-button-available resource-button-data"
             href="https://github.com/WangLongZJU/DirtyMoCap/blob/main/Dataset.md"
             target="_blank"
             rel="noreferrer"
@@ -421,7 +421,7 @@ export default function Home() {
             <span className="resource-status">HKMALA-Motion</span>
           </a>
           <a
-            className="resource-button resource-button-available"
+            className="resource-button resource-button-available resource-button-license"
             href="https://github.com/WangLongZJU/DirtyMoCap/blob/main/License.md"
             target="_blank"
             rel="noreferrer"

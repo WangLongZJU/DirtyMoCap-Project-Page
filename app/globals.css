@@ -325,6 +325,31 @@ body {
   background: #842626;
 }
 
+.resource-button-data {
+  border-color: #6d6b91;
+  background: #6d6b91;
+}
+
+.resource-button-data:hover {
+  border-color: #585675;
+  background: #585675;
+}
+
+.resource-button-license {
+  border-color: #8a6b46;
+  background: #8a6b46;
+}
+
+.resource-button-license:hover {
+  border-color: #70563a;
+  background: #70563a;
+}
+
+.resource-button-data .resource-status,
+.resource-button-license .resource-status {
+  color: rgba(255, 255, 255, 0.96);
+}
+
 .resource-label {
   font-size: 0.98rem;
   font-weight: 600;
